@@ -1,0 +1,13 @@
+CACHE MANIFEST
+
+# Offline cache v1
+# html files
+canvas-clock.html
+
+# js files
+js/dtween/dtween.js
+js/dtween/easing/Bounce.js
+
+# images
+canvas-clock_icon_57x57.png
+canvas-clock_icon_114x114.png

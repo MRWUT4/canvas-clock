@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html lang="en" manifest="canvas-clock.manifest">
+	
+	<head>
+	
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" /> 
+    <meta name="viewport" content = "user-scalable = no" />   
+	<meta charset="utf-8">
+	
+	<link rel="apple-touch-icon" href="canvas-clock_icon_57x57.png" />
+	<link rel="apple-touch-icon" sizes="114x114" href="canvas-clock_icon_114x114.png" />
+	
+	<title>canvas clock</title>
+	
+	<style type="text/css"> 
+	
+		body 
+		{
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
+		}
+	
+		.landscape
+		{
+			-webkit-transform: translate(0px,-190px);
+		}
+	
+	</style>
+	
+	<script type="text/javascript" src="js/dtween/dtween.js"></script>
+	<script type="text/javascript" src="js/dtween/easing/Bounce.js"></script>
+	
+	</head>
+	
+<body onload = "init();" ontouchmove="preventScroll(event);">
+
+<script>
+
+/* NO SCROLLING */ 
+
+function preventScroll(event)
+{
+	event.preventDefault();
+}
+
+/* WINDOW ORIENTATION */
+
+window.addEventListener("orientationchange", function () 
+{
+    if(window.orientation == -90)
+        document.body.className = "landscape";
+        
+    if(window.orientation == 90)
+        document.body.className = "landscape";
+        
+    if(window.orientation == 0)
+        document.body.className = "";
+        
+}, true);
+
+function init()
+{
+	/* INIT CANVAS */
+	
+	var canvas = document.createElement("canvas"),
+		context = canvas.getContext("2d");
+	
+	var width = window.innerWidth,
+		height = window.innerHeight;
+	
+	canvas.width = width;
+	canvas.height = height;
+	
+	document.body.appendChild(canvas);
+	
+	
+	/* INIT NUMBER GRIDS */
+	
+	var grid0 = [[1, 1, 1],
+				 [1, 0, 1],
+				 [1, 0, 1],
+				 [1, 0, 1],
+				 [1, 1, 1]];
+
+	var grid1 = [[0, 1, 0],
+				 [0, 1, 0],
+				 [0, 1, 0],
+				 [0, 1, 0],
+ 				 [0, 1, 0]];
+
+	var grid2 = [[1, 1, 1],
+				 [0, 0, 1],
+				 [1, 1, 1],
+				 [1, 0, 0],
+ 				 [1, 1, 1]];
+
+	var grid3 = [[1, 1, 1],
+				 [0, 0, 1],
+				 [1, 1, 0],
+				 [0, 0, 1],
+ 				 [1, 1, 1]];
+ 				 
+	var grid3 = [[1, 1, 1],
+				 [0, 0, 1],
+				 [1, 1, 1],
+				 [0, 0, 1],
+ 				 [1, 1, 1]];
+
+	var grid4 = [[1, 0, 1],
+				 [1, 0, 1],
+				 [1, 1, 1],
+				 [0, 0, 1],
+ 				 [0, 0, 1]];
+ 				 
+	var grid5 = [[1, 1, 1],
+				 [1, 0, 0],
+				 [1, 1, 1],
+				 [0, 0, 1],
+ 				 [1, 1, 1]];
+ 				 
+	var grid6 = [[1, 1, 1],
+				 [1, 0, 0],
+				 [1, 1, 1],
+				 [1, 0, 1],
+ 				 [1, 1, 1]];
+
+	var grid7 = [[1, 1, 1],
+				 [0, 0, 1],
+				 [0, 0, 1],
+				 [0, 0, 1],
+ 				 [0, 0, 1]];
+
+	var grid8 = [[1, 1, 1],
+				 [1, 0, 1],
+				 [1, 1, 1],
+				 [1, 0, 1],
+ 				 [1, 1, 1]];
+
+	var grid9 = [[1, 1, 1],
+				 [1, 0, 1],
+				 [1, 1, 1],
+				 [0, 0, 1],
+ 				 [0, 0, 1]];
+	
+	var grid10 = [[1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1],
+				  [1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1],
+				  [0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1],
+				  [0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+ 				  [1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1]]; 
+
+	var grid11 = [[1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0],
+				  [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+				  [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0],
+				  [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+ 				  [1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0]]; 
+ 				  
+	var grid12 = [[1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+				  [1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+				  [1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+				  [1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0],
+ 				  [1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1]]; 	
+ 
+ 	var grid13 = [[1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+				  [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+				  [1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+				  [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0],
+ 				  [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1]]; 	
+ 
+	var grid14 = [[1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1],
+				  [1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+				  [1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0],
+				  [1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+ 				  [1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0]]; 	
+ 				  
+	var grid15 = [[1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+				  [1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1],
+				  [0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1],
+				  [0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+ 				  [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1]]; 
+ 
+	var grid16 = [[1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+				  [1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+				  [0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+				  [0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+ 				  [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1]]; 
+ 	
+ 	var grid17 = [[1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1],
+				  [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0],
+				  [1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1],
+				  [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+ 				  [1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1]]; 	
+ 				 
+ 	var grid18 = [[1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
+				  [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+				  [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
+				  [0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+ 				  [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0]]; 	
+ 
+ 	var grid19 = [[1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1],
+				  [1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+				  [1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+				  [1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+ 				  [1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0]]; 
+ 				  
+ 	var grid20 = [[1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1],
+				  [1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+				  [1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+				  [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0],
+ 				  [1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0]];
+
+ 	var grid21 = [[1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1],
+				  [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1],
+				  [1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0],
+				  [1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0],
+ 				  [1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1]];
+ 				  
+	var tileGrid = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+	
+	var tileList = [[], [], [], [], [], [], [], [], [], [], []];
+		
+	var gridListNumbers = [grid0, grid1, grid2, grid3, grid4, grid5, grid6, grid7, grid8, grid9];
+	var gridListMonths = [grid10, grid11, grid12, grid13, grid14, grid15, grid16, grid17, grid18, grid19, grid20, grid21];
+	
+	/* INIT TILES */
+	
+	var tile;
+	var tileSize = 28;
+	var tileGap = 5;
+	
+	var startX = 46;
+	var startY = 300;
+	
+	for(var iY = 0; iY < tileGrid.length; ++iY)
+	{
+		for(var iX = 0; iX < tileGrid[0].length; ++iX)
+		{	
+			var tileValue = tileGrid[iY][iX];
+			
+			if(tileValue != 2)
+			{				
+				var indexValue = (tileValue == 0) ? tileSize : -tileSize;
+	
+				tile = new TileObject(startX + (iX * (tileSize + tileGap)), startY + (iY * (tileSize + tileGap)), tileSize, tileSize);
+				tile.width = indexValue;		
+				tile.draw();
+				
+				tileList[iY][iX] = tile;
+			}
+		}
+	}
+	
+	function TileObject(pX, pY, pWidth, pHeight)
+	{
+		this.tileWidth = pWidth;
+		this.tileHeight = pHeight;
+		this.width = pWidth;
+		this.height = pHeight;
+		this.x = pX + this.width * .5;
+		this.y = pY + this.height * .5;
+
+		this.color0 = "#333333";
+		this.color1 = "#ffffff";
+		
+		this.draw = function()
+		{						
+			if(this.width > 0)
+				context.fillStyle = this.color0;
+			else
+				context.fillStyle = this.color1;
+								
+			context.fillRect(this.x - this.width * .5, this.y - this.height * .5, this.width, this.height);
+		}
+	}
+	
+	
+	/* INIT DTWEEN */
+		
+	var dtween = new DoTween(30, render);
+		
+	function render()
+	{
+		context.clearRect(0, 0, width, height);
+		
+		for(var iY = 0; iY < tileGrid.length; ++iY)
+		{
+			for(var iX = 0; iX < tileGrid[0].length; ++iX)
+			{
+				particle = tileList[iY][iX];
+	
+				if(typeof(particle) == "object")
+					particle.draw();
+			}
+		}	
+	}
+	
+	
+	/* INIT TIME */
+	
+	var date;	
+	var seconds;
+	
+	var tt = 0;
+	
+	setInterval(timeoutHandler, 1000);
+	
+	function timeoutHandler()
+	{
+		date = new Date();
+		
+		var month = date.getMonth();
+		replaceGridAtPosition(tileList[0].length - gridListMonths[month][0].length, 6, month, gridListMonths);
+
+		replaceGridAtPosition(-3 + tileList[0].length - gridListMonths[month][0].length - gridListNumbers[0][0].length * 2, 6, position(date.getDate()).position0, gridListNumbers);
+		replaceGridAtPosition(1 + tileList[0].length - gridListMonths[month][0].length - gridListNumbers[0][0].length * 2, 6, position(date.getDate()).position1, gridListNumbers);
+				
+		replaceGridAtPosition(0, 0, position(date.getHours()).position0, gridListNumbers);
+		replaceGridAtPosition(4, 0, position(date.getHours()).position1, gridListNumbers);
+		
+		replaceGridAtPosition(10, 0, position(date.getMinutes()).position0, gridListNumbers);
+		replaceGridAtPosition(14, 0, position(date.getMinutes()).position1, gridListNumbers);
+		
+		replaceGridAtPosition(20, 0, position(date.getSeconds()).position0, gridListNumbers);
+		replaceGridAtPosition(24, 0, position(date.getSeconds()).position1, gridListNumbers);
+	}
+	
+	function position(pValue)
+	{		
+		var obj = {};
+		
+		obj.position1 = String(pValue).charAt(1);
+		obj.position0 = String(pValue).charAt(0);	
+
+		if(obj.position1 == "")
+		{
+			obj.position1 = Number(obj.position0);
+			obj.position0 = 0;
+		}
+		
+		return obj;
+	}
+	
+	function replaceGridAtPosition(pPositionX, pPositionY, pValue, pList)
+	{	
+		var grid = pList[pValue];
+		var tileValue = 0;
+		var tile;
+		
+		for(var iY = 0; iY < grid.length; ++iY)
+		{
+			for(var iX = 0; iX < grid[0].length; ++iX)
+			{
+				tileGrid[iY + pPositionY][iX + pPositionX] = grid[iY][iX];
+				tileValue = grid[iY][iX] == 0 ? tileSize : -tileSize;
+				
+				tile = tileList[iY + pPositionY][iX + pPositionX];
+				
+				if(typeof(tile) == "object" && tile.destintationValue != tileValue)
+					dtween.to(tile, 1, {delay:iX * .05, width:tileValue, ease:easeOutBounce});
+				
+				tile.destintationValue = tileValue;
+			}
+		}
+	}
+}
+</script>
+
+</body>
+</html>
